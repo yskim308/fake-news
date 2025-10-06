@@ -1,15 +1,33 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
-	"github.om/yskim308/fake-news/db"
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"io"
 	"log"
 	"net/http"
+	"os"
 )
 
 func main() {
-	// Hello world, the web server
+	// connect to database
+	connStr := os.Getenv("DATABASE_URL")
+	if connStr == "" {
+		log.Fatal("DATABASE_URL not sent in env")
+	}
+
+	db, err := sql.Open("pgx", connStr)
+	if err != nil {
+		log.Fatal("Open error:", err)
+	}
+
+	err = db.Ping()
+	if err != nil {
+		log.Fatal("Ping error:", err)
+	}
+
+	fmt.Println("connected to database")
 
 	http.HandleFunc("/hello", func(w http.ResponseWriter, req *http.Request) {
 		io.WriteString(w, "Hello, world!\n")
