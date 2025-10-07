@@ -5,15 +5,26 @@ import (
 	"log"
 )
 
-func (r *Repository) CreateEntry(title string, thumbnailURL string, imageURL string) {
+type Post struct {
+	id           int
+	title        string
+	thumbnailUrl string
+	imageUrl     string
+}
+
+func (r *Repository) CreateEntry(
+	title string, 
+	thumbnailURL string,
+	imageURL string
+) error {
 	db := r.db
 	if db == nil {
 		fmt.Println("DB NOT INITIALIZED")
-		return
+		return fmt.Errorf("database connection not initialized")
 	}
 
 	_, err := db.Exec(`
-		INSERT INTO POSTS ( title, thumbnail_url, image_url)
+		INSERT INTO POSTS (title, thumbnail_url, image_url)
 		VALUES ($1, $2, $3)
 	`, title, thumbnailURL, imageURL)
 
@@ -22,21 +33,22 @@ func (r *Repository) CreateEntry(title string, thumbnailURL string, imageURL str
 	}
 }
 
-func GetEntry(r *Repository) (id int) {
+func (r *Repository) GetEntry(id int) (Post, error) {
 	db := r.db
 	if db == nil {
 		fmt.Println("DB NOT INITIALIZED")
-		return
+		return Post{}, fmt.Errorf("database connection not initialized")
 	}
 
-	var title, thumbnailURL, imageURL string
+	var post Post
 
 	err := db.QueryRow(`
 		SELECT title, thumbnail_url, image_url
 		FROM posts 
 		WHERE id=$1
-		`, id).Scan(&title, &thumbnailURL, &imageURL)
+		`, id).Scan(&post.title, &post.thumbnailUrl, &post.imageUrl)
 	if err != nil {
 		log.Printf("failed to fetch entry: %v", err)
 	}
+	return post, nil
 }
