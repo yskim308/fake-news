@@ -5,8 +5,8 @@ import (
 	"log"
 )
 
-func CreateEntry(title string, thumbnailURL string, imageURL string) {
-	db := DBinstance
+func (r *Repository) CreateEntry(title string, thumbnailURL string, imageURL string) {
+	db := r.db
 	if db == nil {
 		fmt.Println("DB NOT INITIALIZED")
 		return
@@ -22,8 +22,8 @@ func CreateEntry(title string, thumbnailURL string, imageURL string) {
 	}
 }
 
-func GetEntry(id int) {
-	db := DBinstance
+func GetEntry(r *Repository) (id int) {
+	db := r.db
 	if db == nil {
 		fmt.Println("DB NOT INITIALIZED")
 		return
