@@ -14,7 +14,7 @@ func main() {
 	repo.Connect()
 
 	http.HandleFunc("/hello", func(w http.ResponseWriter, req *http.Request) {
-		io.WriteString(w, "Hello, world!\n")
+		io.WriteString(w, "Hello, from hello!\n")
 	})
 
 	port := 4000

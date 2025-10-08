@@ -7,15 +7,15 @@ import (
 
 type Post struct {
 	Id           int
-	Iitle        string
+	Title        string
 	ThumbnailUrl string
 	ImageUrl     string
 }
 
 func (r *Repository) CreateEntry(
-	title string, 
+	title string,
 	thumbnailURL string,
-	imageURL string
+	imageURL string,
 ) error {
 	db := r.db
 	if db == nil {
@@ -31,6 +31,7 @@ func (r *Repository) CreateEntry(
 	if err != nil {
 		log.Printf("failed to create entry: %v", err)
 	}
+	return nil
 }
 
 func (r *Repository) GetEntry(id int) (Post, error) {

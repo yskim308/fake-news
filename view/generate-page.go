@@ -2,7 +2,6 @@ package view
 
 import (
 	"bytes"
-	"fmt"
 	"html/template"
 	"log"
 
