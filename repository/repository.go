@@ -6,10 +6,10 @@ import (
 )
 
 type Post struct {
-	id           int
-	title        string
-	thumbnailUrl string
-	imageUrl     string
+	Id           int
+	Iitle        string
+	ThumbnailUrl string
+	ImageUrl     string
 }
 
 func (r *Repository) CreateEntry(
@@ -46,7 +46,7 @@ func (r *Repository) GetEntry(id int) (Post, error) {
 		SELECT title, thumbnail_url, image_url
 		FROM posts 
 		WHERE id=$1
-		`, id).Scan(&post.title, &post.thumbnailUrl, &post.imageUrl)
+		`, id).Scan(&post.Title, &post.ThumbnailUrl, &post.ImageUrl)
 	if err != nil {
 		log.Printf("failed to fetch entry: %v", err)
 	}
