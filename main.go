@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/yskim308/fake-news/repository"
 	"io"
 	"log"
@@ -14,7 +13,7 @@ func main() {
 	repo.Connect()
 
 	http.HandleFunc("/hello", func(w http.ResponseWriter, req *http.Request) {
-		io.WriteString(w, "Hello, from hello!\n")
+		io.WriteString(w, "Hello, world!\n")
 	})
 
 	port := 4000

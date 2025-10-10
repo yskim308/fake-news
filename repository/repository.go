@@ -2,15 +2,9 @@ package repository
 
 import (
 	"fmt"
+	"github.com/yskim308/fake-news/data"
 	"log"
 )
-
-type Post struct {
-	Id           int
-	Title        string
-	ThumbnailUrl string
-	ImageUrl     string
-}
 
 func (r *Repository) CreateEntry(
 	title string,
@@ -34,14 +28,14 @@ func (r *Repository) CreateEntry(
 	return nil
 }
 
-func (r *Repository) GetEntry(id int) (Post, error) {
+func (r *Repository) GetEntry(id int) (data.Post, error) {
 	db := r.db
 	if db == nil {
 		fmt.Println("DB NOT INITIALIZED")
-		return Post{}, fmt.Errorf("database connection not initialized")
+		return data.Post{}, fmt.Errorf("database connection not initialized")
 	}
 
-	var post Post
+	var post data.Post
 
 	err := db.QueryRow(`
 		SELECT title, thumbnail_url, image_url
