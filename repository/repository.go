@@ -6,11 +6,7 @@ import (
 	"log"
 )
 
-func (r *Repository) CreateEntry(
-	title string,
-	thumbnailURL string,
-	imageURL string,
-) error {
+func (r *Repository) CreateEntry(submision data.Submission) error {
 	db := r.db
 	if db == nil {
 		fmt.Println("DB NOT INITIALIZED")
@@ -20,7 +16,7 @@ func (r *Repository) CreateEntry(
 	_, err := db.Exec(`
 		INSERT INTO POSTS (title, thumbnail_url, image_url)
 		VALUES ($1, $2, $3)
-	`, title, thumbnailURL, imageURL)
+	`, submision.Title, submision.ImageURL, submision.ThumbnailURL)
 
 	if err != nil {
 		log.Printf("failed to create entry: %v", err)
@@ -45,5 +41,3 @@ func (r *Repository) GetEntry(id int) (data.Post, error) {
 	if err != nil {
 		log.Printf("failed to fetch entry: %v", err)
 	}
-	return post, nil
-}
