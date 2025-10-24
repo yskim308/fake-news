@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"io"
@@ -9,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/yskim308/fake-news/data"
 	"github.com/yskim308/fake-news/repository"
 	"github.com/yskim308/fake-news/view"
 )
@@ -50,6 +52,31 @@ func main() {
 		if err != nil {
 			log.Fatal("error executing template for form: ", err)
 		}
+	})
+
+	http.HandleFunc("/submit", func(w http.ResponseWriter, req *http.Request) {
+		if req.Method != http.MethodPost {
+			http.Error(w, "Only POST requests are allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		defer req.Body.Close()
+
+		var submission data.Submission
+
+		err := json.NewDecoder(req.Body).Decode(&submission)
+		if err != nil {
+			log.Printf("Error decoding JSON: %v", err)
+			http.Error(w, "invalid request body format", http.StatusBadRequest)
+		}
+
+		err = repo.CreateEntry(submission)
+		if err != nil {
+			log.Printf("Error creating entry in database: %v", err)
+			http.Error(w, "error creating entry in database: %v", http.StatusBadRequest)
+		}
+
+		w.Header().Set("Content-Type", "application/JSON")
+		w.WriteHeader(http.StatusOK)
 	})
 
 	port := 4000
