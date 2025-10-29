@@ -24,11 +24,13 @@ func main() {
 		pathPrefix := "/news/articles/"
 		if path == pathPrefix {
 			http.Error(w, "article ID missing", http.StatusBadRequest)
+			return
 		}
 
 		id, err := strconv.Atoi(strings.TrimPrefix(path, pathPrefix))
 		if err != nil {
 			http.Error(w, "id is not an integer, invalid path", http.StatusBadRequest)
+			return
 		}
 
 		generatedHTML := view.GeneratePage(id, repo)
@@ -47,6 +49,7 @@ func main() {
 		err = tmpl.Execute(w, nil)
 		if err != nil {
 			log.Fatal("error executing template for form: ", err)
+			return
 		}
 	})
 
@@ -63,12 +66,15 @@ func main() {
 		if err != nil {
 			log.Printf("Error decoding JSON: %v", err)
 			http.Error(w, "invalid request body format", http.StatusBadRequest)
+			return
 		}
 
-		err = repo.CreateEntry(submission)
+		var id int64
+		id, err = repo.CreateEntry(submission)
 		if err != nil {
 			log.Printf("Error creating entry in database: %v", err)
 			http.Error(w, "error creating entry in database: %v", http.StatusBadRequest)
+			return
 		}
 
 		w.Header().Set("Content-Type", "application/JSON")
