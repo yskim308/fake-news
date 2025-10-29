@@ -77,8 +77,19 @@ func main() {
 			return
 		}
 
+		response := struct {
+			ID int64 `json:"id"`
+		}{
+			ID: id,
+		}
+
 		w.Header().Set("Content-Type", "application/JSON")
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusCreated)
+
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			log.Printf("error encondign response")
+			return
+		}
 	})
 
 	port := 4000
