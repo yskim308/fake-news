@@ -32,7 +32,10 @@ func main() {
 			return
 		}
 
-		generatedHTML := view.GeneratePage(id, repo)
+		generatedHTML, error := view.GeneratePage(id, repo)
+		if error != nil {
+			http.Error(w, error.Error(), http.StatusInternalServerError)
+		}
 		w.Header().Set("Content-Type", "text/html")
 		w.Write([]byte(generatedHTML))
 	})
