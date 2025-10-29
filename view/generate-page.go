@@ -12,7 +12,7 @@ type EntryGetter interface {
 }
 
 func GeneratePage(id int, repo EntryGetter) (string, error) {
-	const templateFilePath = "./main.html"
+	const templateFilePath = "./view/main.html"
 	tmpl := template.Must(template.ParseFiles(templateFilePath))
 
 	post, err := repo.GetEntry(id)
