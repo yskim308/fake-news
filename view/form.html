@@ -1,14 +1,78 @@
 <!doctype html>
 <html>
   <head>
-    <title>Find Post</title>
+    <title>Create Post</title>
   </head>
   <body>
-    <h1>Search for a Post</h1>
-    <form method="POST" action="/view-post">
-      <label for="post-id">Enter Post ID:</label>
-      <input type="number" id="post-id" name="id" required />
-      <button type="submit">View Post</button>
+    <h1>Create a New Post</h1>
+
+    <form id="submission-form" action="/submit" method="POST">
+      <div>
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required />
+      </div>
+      <div>
+        <label for="thumbnailURL">Thumbnail URL:</label>
+        <input type="url" id="thumbnailURL" name="thumbnailURL" required />
+      </div>
+      <div>
+        <label for="imageURL">Image URL:</label>
+        <input type="url" id="imageURL" name="imageURL" required />
+      </div>
+      <button type="submit">Submit Post</button>
     </form>
+
+    <script>
+      // 1. Find the form on the page
+      const form = document.getElementById("submission-form");
+
+      // 2. Listen for the 'submit' event
+      form.addEventListener("submit", async function (event) {
+        // 3. Stop the default HTML form submission (which sends urlencoded data)
+        event.preventDefault();
+
+        // 4. Get the values from the form fields
+        const title = document.getElementById("title").value;
+        const thumbnailURL = document.getElementById("thumbnailURL").value;
+        const imageURL = document.getElementById("imageURL").value;
+
+        // 5. Create the JavaScript object that matches your Go struct
+        const submissionData = {
+          title: title,
+          thumbnailURL: thumbnailURL,
+          imageURL: imageURL,
+        };
+
+        try {
+          // 6. Send the data as JSON to your Go handler
+          const response = await fetch("/submit", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(submissionData), // Convert the JS object to a JSON string
+          });
+
+          // 7. Check if the submission was successful (e.g., status 201 Created)
+          if (response.ok) {
+            // 8. Get the JSON response from the server (which is { "id": 123 })
+            const result = await response.json();
+            const newId = result.id;
+
+            // 9. Redirect to the new article page
+            console.log("Successfully created post with ID:", newId);
+            window.location.href = `/news/articles/${newId}`;
+          } else {
+            // Handle server errors (e.g., status 400 or 500)
+            const errorText = await response.text();
+            alert(`Submission failed: ${errorText}`);
+          }
+        } catch (error) {
+          // Handle network errors
+          console.error("Network error:", error);
+          alert("A network error occurred. Please try again.");
+        }
+      });
+    </script>
   </body>
 </html>
