@@ -19,10 +19,6 @@ func main() {
 	repo := &repository.Repository{}
 	repo.Connect()
 
-	http.HandleFunc("/hello", func(w http.ResponseWriter, req *http.Request) {
-		io.WriteString(w, "Hello, world!\n")
-	})
-
 	http.HandleFunc("/news/articles/", func(w http.ResponseWriter, req *http.Request) {
 		path := req.URL.Path
 		pathPrefix := "/news/articles/"

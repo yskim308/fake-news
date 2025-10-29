@@ -41,3 +41,6 @@ func (r *Repository) GetEntry(id int) (data.Post, error) {
 	if err != nil {
 		log.Printf("failed to fetch entry: %v", err)
 	}
+
+	return post, nil
+}
