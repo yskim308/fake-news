@@ -6,14 +6,14 @@ import (
 	"log"
 )
 
-func (r *Repository) CreateEntry(submision data.Submission) (int64, error) {
+func (r *Repository) CreateEntry(submision data.Submission) (string, error) {
 	db := r.db
 	if db == nil {
 		fmt.Println("DB NOT INITIALIZED")
-		return 0, fmt.Errorf("database connection not initialized")
+		return "", fmt.Errorf("database connection not initialized")
 	}
 
-	var insertedID int64
+	var insertedID string
 
 	err := db.QueryRow(`
         INSERT INTO POSTS (title, thumbnail_url, image_url)
@@ -23,14 +23,14 @@ func (r *Repository) CreateEntry(submision data.Submission) (int64, error) {
 
 	if err != nil {
 		log.Printf("failed to create entry: %v", err)
-		return 0, err
+		return "", err
 	}
 
 	// 5. Return the new ID
 	return insertedID, nil
 }
 
-func (r *Repository) GetEntry(id int) (data.Post, error) {
+func (r *Repository) GetEntry(id string) (data.Post, error) {
 	db := r.db
 	if db == nil {
 		fmt.Println("DB NOT INITIALIZED")

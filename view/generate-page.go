@@ -8,10 +8,10 @@ import (
 )
 
 type EntryGetter interface {
-	GetEntry(id int) (data.Post, error)
+	GetEntry(id string) (data.Post, error)
 }
 
-func GeneratePage(id int, repo EntryGetter) (string, error) {
+func GeneratePage(id string, repo EntryGetter) (string, error) {
 	const templateFilePath = "./view/main.html"
 	tmpl := template.Must(template.ParseFiles(templateFilePath))
 

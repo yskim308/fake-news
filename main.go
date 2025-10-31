@@ -6,7 +6,6 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/yskim308/fake-news/data"
@@ -26,11 +25,7 @@ func main() {
 			return
 		}
 
-		id, err := strconv.Atoi(strings.TrimPrefix(path, pathPrefix))
-		if err != nil {
-			http.Error(w, "id is not an integer, invalid path", http.StatusBadRequest)
-			return
-		}
+		id := strings.TrimPrefix(path, pathPrefix)
 
 		generatedHTML, error := view.GeneratePage(id, repo)
 		if error != nil {
@@ -71,7 +66,7 @@ func main() {
 			return
 		}
 
-		var id int64
+		var id string
 		id, err = repo.CreateEntry(submission)
 		if err != nil {
 			log.Printf("Error creating entry in database: %v", err)
@@ -80,7 +75,7 @@ func main() {
 		}
 
 		response := struct {
-			ID int64 `json:"id"`
+			ID string `json:"id"`
 		}{
 			ID: id,
 		}

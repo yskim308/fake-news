@@ -1,7 +1,7 @@
 package data
 
 type Post struct {
-	Id           int
+	Id           string
 	Title        string
 	ThumbnailUrl string
 	ImageUrl     string
