@@ -40,7 +40,7 @@ func GenerateDbConnectToken(
 	return token, nil
 }
 
-func CreateTokenUrl(dbConfig Config) string {
+func CreateConnectionString(dbConfig Config) string {
 	var str strings.Builder
 	str.WriteString("postgres://")
 	str.WriteString(dbConfig.User)
