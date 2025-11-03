@@ -25,7 +25,8 @@ type Config struct {
 }
 
 func GenerateDbConnectToken(
-	ctx context.Context, clusterEndpoint, region string) (string, error) {
+	ctx context.Context, clusterEndpoint, region string,
+) (string, error) {
 	cfg, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
 		return "", err
