@@ -1,12 +1,14 @@
 package repository
 
 import (
+	"context"
 	"fmt"
-	"github.com/yskim308/fake-news/data"
 	"log"
+
+	"github.com/yskim308/fake-news/data"
 )
 
-func (r *Repository) CreateEntry(submision data.Submission) (string, error) {
+func (r *Repository) CreateEntry(ctx context.Context, submision data.Submission) (string, error) {
 	db := r.db
 	if db == nil {
 		fmt.Println("DB NOT INITIALIZED")
@@ -15,7 +17,7 @@ func (r *Repository) CreateEntry(submision data.Submission) (string, error) {
 
 	var insertedID string
 
-	err := db.QueryRow(`
+	err := db.QueryRow(ctx, `
         INSERT INTO POSTS (title, thumbnail_url, image_url)
         VALUES ($1, $2, $3)
         RETURNING id
@@ -30,7 +32,7 @@ func (r *Repository) CreateEntry(submision data.Submission) (string, error) {
 	return insertedID, nil
 }
 
-func (r *Repository) GetEntry(id string) (data.Post, error) {
+func (r *Repository) GetEntry(ctx context.Context, id string) (data.Post, error) {
 	db := r.db
 	if db == nil {
 		fmt.Println("DB NOT INITIALIZED")
@@ -39,7 +41,7 @@ func (r *Repository) GetEntry(id string) (data.Post, error) {
 
 	var post data.Post
 
-	err := db.QueryRow(`
+	err := db.QueryRow(ctx, `
 		SELECT title, thumbnail_url, image_url
 		FROM posts 
 		WHERE id=$1

@@ -5,14 +5,8 @@ import (
 	"fmt"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/feature/dsql/auth"
-	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
-	"log"
 	"os"
-	"strconv"
 	"strings"
-	"time"
 )
 
 type Config struct {

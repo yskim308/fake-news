@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -15,7 +16,8 @@ import (
 
 func main() {
 	repo := &repository.Repository{}
-	repo.Connect()
+	ctx := context.Background()
+	repo.Connect(ctx)
 
 	http.HandleFunc("/news/articles/", func(w http.ResponseWriter, req *http.Request) {
 		path := req.URL.Path

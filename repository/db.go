@@ -1,35 +1,61 @@
 package repository
 
 import (
-	"database/sql"
+	"context"
 	"fmt"
-	"log"
-	"os"
-
-	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Repository struct {
-	db *sql.DB
+	db *pgxpool.Pool
 }
 
-func (r *Repository) Connect() {
-	connStr := os.Getenv("DATABASE_URL")
-	if connStr == "" {
-		log.Fatal("DATABASE_URL not sent in env")
+func (r *Repository) Connect(
+	ctx context.Context,
+) error {
+	poolCtx, cancel := context.WithCancel(ctx)
+
+	dbConfig := Config{
+		Host:     getEnvOrThrow("CLUSTER_ENDPOINT"),
+		Region:   getEnvOrThrow("REGION"),
+		Port:     getEnv("DB_PORT", "5432"),
+		Database: getEnv("DB_NAME", "postgres"),
+		Password: "",
 	}
 
-	var err error
-	DBinstance, err := sql.Open("pgx", connStr)
+	url := CreateConnectionString(dbConfig)
+
+	poolConfig, err := pgxpool.ParseConfig(url)
 	if err != nil {
-		log.Fatal("Open error:", err)
+		cancel()
+		return fmt.Errorf("unable to parse pool config")
 	}
 
-	err = DBinstance.Ping()
+	poolConfig.BeforeConnect = func(ctx context.Context, cfg *pgx.ConnConfig) error {
+		token, err := GenerateDbConnectToken(ctx, dbConfig.Host, dbConfig.Region)
+		if err != nil {
+			return fmt.Errorf("failed to generate auth token %w", err)
+		}
+		cfg.Password = token
+		return nil
+	}
+
+	poolConfig.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
+		schema := "public"
+		_, err := conn.Exec(ctx, fmt.Sprintf("SET search_path = %s", schema))
+		if err != nil {
+			return fmt.Errorf("failed to set search_path to %s: %w", schema, err)
+		}
+		return nil
+	}
+
+	pgxPool, err := pgxpool.NewWithConfig(poolCtx, poolConfig)
 	if err != nil {
-		log.Fatal("Ping error:", err)
+		cancel()
+		return fmt.Errorf("unable to create connection pool: %v", err)
 	}
 
-	r.db = DBinstance
-	fmt.Println("connected to database")
+	r.db = pgxPool
+	return nil
 }
