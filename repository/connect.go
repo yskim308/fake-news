@@ -18,7 +18,6 @@ import (
 type Config struct {
 	Host     string
 	Port     string
-	User     string
 	Password string
 	Database string
 	Region   string
@@ -32,7 +31,6 @@ func GenerateDbConnectToken(
 		return "", err
 	}
 
-	//assuming that the user is admin
 	token, err := auth.GenerateDBConnectAdminAuthToken(ctx, clusterEndpoint, region, cfg.Credentials)
 	if err != nil {
 		return "", err
@@ -44,7 +42,7 @@ func GenerateDbConnectToken(
 func CreateConnectionString(dbConfig Config) string {
 	var str strings.Builder
 	str.WriteString("postgres://")
-	str.WriteString(dbConfig.User)
+	str.WriteString("admin")
 	str.WriteString("@")
 	str.WriteString(dbConfig.Host)
 	str.WriteString(":")
