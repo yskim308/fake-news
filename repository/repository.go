@@ -48,6 +48,7 @@ func (r *Repository) GetEntry(ctx context.Context, id string) (data.Post, error)
 		`, id).Scan(&post.Title, &post.ThumbnailUrl, &post.ImageUrl)
 	if err != nil {
 		log.Printf("failed to fetch entry: %v", err)
+		return data.Post{}, err
 	}
 
 	return post, nil
