@@ -29,7 +29,7 @@ func main() {
 
 		id := strings.TrimPrefix(path, pathPrefix)
 
-		generatedHTML, error := view.GeneratePage(id, repo)
+		generatedHTML, error := view.GeneratePage(ctx, id, repo)
 		if error != nil {
 			http.Error(w, error.Error(), http.StatusInternalServerError)
 		}
@@ -69,7 +69,7 @@ func main() {
 		}
 
 		var id string
-		id, err = repo.CreateEntry(submission)
+		id, err = repo.CreateEntry(ctx, submission)
 		if err != nil {
 			log.Printf("Error creating entry in database: %v", err)
 			http.Error(w, "error creating entry in database: %v", http.StatusBadRequest)
