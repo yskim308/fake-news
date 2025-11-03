@@ -2,20 +2,22 @@ package view
 
 import (
 	"bytes"
-	"github.com/yskim308/fake-news/data"
+	"context"
 	"html/template"
 	"log"
+
+	"github.com/yskim308/fake-news/data"
 )
 
 type EntryGetter interface {
-	GetEntry(id string) (data.Post, error)
+	GetEntry(ctx context.Context, id string) (data.Post, error)
 }
 
-func GeneratePage(id string, repo EntryGetter) (string, error) {
+func GeneratePage(ctx context.Context, id string, repo EntryGetter) (string, error) {
 	const templateFilePath = "./view/main.html"
 	tmpl := template.Must(template.ParseFiles(templateFilePath))
 
-	post, err := repo.GetEntry(id)
+	post, err := repo.GetEntry(ctx, id)
 	if err != nil {
 		log.Fatal(err)
 		return "", err
