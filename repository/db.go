@@ -14,8 +14,6 @@ type Repository struct {
 func (r *Repository) Connect(
 	ctx context.Context,
 ) error {
-	poolCtx, cancel := context.WithCancel(ctx)
-
 	dbConfig := Config{
 		Host:     getEnvOrThrow("CLUSTER_ENDPOINT"),
 		Region:   getEnvOrThrow("REGION"),
@@ -28,7 +26,6 @@ func (r *Repository) Connect(
 
 	poolConfig, err := pgxpool.ParseConfig(url)
 	if err != nil {
-		cancel()
 		return fmt.Errorf("unable to parse pool config")
 	}
 
@@ -50,9 +47,8 @@ func (r *Repository) Connect(
 		return nil
 	}
 
-	pgxPool, err := pgxpool.NewWithConfig(poolCtx, poolConfig)
+	pgxPool, err := pgxpool.NewWithConfig(ctx, poolConfig)
 	if err != nil {
-		cancel()
 		return fmt.Errorf("unable to create connection pool: %v", err)
 	}
 
