@@ -9,6 +9,9 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/awslabs/aws-lambda-go-api-proxy/httpadapter"
+
 	"github.com/yskim308/fake-news/data"
 	"github.com/yskim308/fake-news/repository"
 	"github.com/yskim308/fake-news/view"
@@ -19,7 +22,10 @@ func main() {
 	ctx := context.Background()
 	repo.Connect(ctx)
 
-	http.HandleFunc("/news/articles/", func(w http.ResponseWriter, req *http.Request) {
+	mux := http.NewServeMux()
+
+	// --- Article endpoint ---
+	mux.HandleFunc("/news/articles/", func(w http.ResponseWriter, req *http.Request) {
 		path := req.URL.Path
 		pathPrefix := "/news/articles/"
 		if path == pathPrefix {
@@ -29,30 +35,32 @@ func main() {
 
 		id := strings.TrimPrefix(path, pathPrefix)
 
-		generatedHTML, error := view.GeneratePage(ctx, id, repo)
-		if error != nil {
-			http.Error(w, error.Error(), http.StatusInternalServerError)
+		generatedHTML, err := view.GeneratePage(ctx, id, repo)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 		w.Header().Set("Content-Type", "text/html")
 		w.Write([]byte(generatedHTML))
 	})
 
-	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
+	// --- Form page ---
+	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 		tmpl, err := template.ParseFiles("./view/form.html")
 		if err != nil {
-			log.Fatal("template not found: ", err)
+			log.Printf("template not found: %v", err)
+			http.Error(w, "template not found", http.StatusInternalServerError)
 			return
 		}
-
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		err = tmpl.Execute(w, nil)
-		if err != nil {
-			log.Fatal("error executing template for form: ", err)
-			return
+		if err := tmpl.Execute(w, nil); err != nil {
+			log.Printf("error executing template for form: %v", err)
+			http.Error(w, "error executing template", http.StatusInternalServerError)
 		}
 	})
 
-	http.HandleFunc("/submit", func(w http.ResponseWriter, req *http.Request) {
+	// --- Submit endpoint ---
+	mux.HandleFunc("/submit", func(w http.ResponseWriter, req *http.Request) {
 		if req.Method != http.MethodPost {
 			http.Error(w, "Only POST requests are allowed", http.StatusMethodNotAllowed)
 			return
@@ -60,38 +68,31 @@ func main() {
 		defer req.Body.Close()
 
 		var submission data.Submission
-
-		err := json.NewDecoder(req.Body).Decode(&submission)
-		if err != nil {
+		if err := json.NewDecoder(req.Body).Decode(&submission); err != nil {
 			log.Printf("Error decoding JSON: %v", err)
 			http.Error(w, "invalid request body format", http.StatusBadRequest)
 			return
 		}
 
-		var id string
-		id, err = repo.CreateEntry(ctx, submission)
+		id, err := repo.CreateEntry(ctx, submission)
 		if err != nil {
 			log.Printf("Error creating entry in database: %v", err)
-			http.Error(w, "error creating entry in database: %v", http.StatusBadRequest)
+			http.Error(w, "error creating entry in database", http.StatusInternalServerError)
 			return
 		}
 
 		response := struct {
 			ID string `json:"id"`
-		}{
-			ID: id,
-		}
+		}{ID: id}
 
-		w.Header().Set("Content-Type", "application/JSON")
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
-
-		if err := json.NewEncoder(w).Encode(response); err != nil {
-			log.Printf("error encondign response")
-			return
-		}
+		json.NewEncoder(w).Encode(response)
 	})
 
-	port := 4000
-	fmt.Printf("listening on port %d", port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
+	// --- Wrap with AWS Lambda adapter ---
+	adapter := httpadapter.New(mux)
+
+	fmt.Println("Lambda function initialized.")
+	lambda.Start(adapter.ProxyWithContext)
 }
