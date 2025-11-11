@@ -1,9 +1,46 @@
 <!doctype html>
 <html>
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta property="og:image" content="{{.ThumbnailUrl}}" />
+    <meta property="og:title" content="{{.Title}}" />
+
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+              serif: ["Georgia", "serif"], // Classic serif for news
+            },
+          },
+        },
+      };
+    </script>
     <title>Create Post</title>
   </head>
   <body>
+    <header class="bg-gray-900 text-white shadow-lg">
+      <div
+        class="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8"
+      >
+        <!-- Clickable Header Title -->
+        <a
+          href="/"
+          class="text-3xl font-bold font-serif transition-opacity hover:opacity-80"
+        >
+          Manchester Herald
+        </a>
+        <!-- You could add nav links here later -->
+        <nav classES="hidden sm:block">
+          <!-- e.g., <a href="/news" class="ml-4">News</a> -->
+        </nav>
+      </div>
+    </header>
     <h1>Create a New Post</h1>
 
     <form id="submission-form" action="/submit" method="POST">
