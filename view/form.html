@@ -7,7 +7,6 @@
     <meta property="og:image" content="{{.ThumbnailUrl}}" />
     <meta property="og:title" content="{{.Title}}" />
 
-    <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -23,44 +22,93 @@
     </script>
     <title>Create Post</title>
   </head>
-  <body>
+  <body class="bg-gray-100 font-sans">
     <header class="bg-gray-900 text-white shadow-lg">
       <div
         class="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8"
       >
-        <!-- Clickable Header Title -->
         <a
           href="/"
           class="text-3xl font-bold font-serif transition-opacity hover:opacity-80"
         >
           Manchester Herald
         </a>
-        <!-- You could add nav links here later -->
-        <nav classES="hidden sm:block">
-          <!-- e.g., <a href="/news" class="ml-4">News</a> -->
-        </nav>
+        <nav class="hidden sm:block"></nav>
       </div>
     </header>
-    <h1>Create a New Post</h1>
 
-    <form id="submission-form" action="/submit" method="POST">
-      <div>
-        <label for="title">Title:</label>
-        <input type="text" id="title" name="title" required />
+    <main class="container mx-auto max-w-2xl mt-10">
+      <div class="bg-white shadow-lg rounded-lg p-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">Create a New Post</h1>
+
+        <form
+          id="submission-form"
+          action="/submit"
+          method="POST"
+          class="space-y-6"
+        >
+          <div>
+            <label
+              for="title"
+              class="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Title:
+            </label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              required
+              class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <label
+              for="thumbnailURL"
+              class="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Thumbnail URL:
+            </label>
+            <input
+              type="url"
+              id="thumbnailURL"
+              name="thumbnailURL"
+              required
+              class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <label
+              for="imageURL"
+              class="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Image URL:
+            </label>
+            <input
+              type="url"
+              id="imageURL"
+              name="imageURL"
+              required
+              class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <button
+              type="submit"
+              class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Submit Post
+            </button>
+          </div>
+        </form>
       </div>
-      <div>
-        <label for="thumbnailURL">Thumbnail URL:</label>
-        <input type="url" id="thumbnailURL" name="thumbnailURL" required />
-      </div>
-      <div>
-        <label for="imageURL">Image URL:</label>
-        <input type="url" id="imageURL" name="imageURL" required />
-      </div>
-      <button type="submit">Submit Post</button>
-    </form>
+    </main>
 
     <script>
-      const form = document.getElementById("submission-form");
+      // const form = document.getElementById("submission-form");
 
       form.addEventListener("submit", async function (event) {
         event.preventDefault();
