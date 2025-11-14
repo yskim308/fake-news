@@ -1,3 +1,4 @@
+# Build stage
 FROM golang:1.25-alpine AS builder
 
 WORKDIR /src
@@ -7,18 +8,19 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o /main .
+# Build binary for Linux
+RUN CGO_ENABLED=0 GOOS=linux go build -o main .
 
+# Lambda runtime image
+FROM public.ecr.aws/lambda/go:latest
 
-# final image
-FROM public.ecr.aws/lambda/provided:al2
-
-# Copy the binary from the "builder" stage
-COPY --from=builder /main /var/task/main
+# Copy Go binary
+COPY --from=builder /src/main ${LAMBDA_TASK_ROOT}
 
 # Copy HTML templates
-RUN mkdir -p /var/task/view
-COPY view/form.html /var/task/view/form.html
-COPY view/main.html /var/task/view/main.html
+COPY view/form.html ${LAMBDA_TASK_ROOT}/view/form.html
+COPY view/main.html ${LAMBDA_TASK_ROOT}/view/main.html
 
+# Lambda will invoke "main"
 CMD [ "main" ]
+
