@@ -1,7 +1,7 @@
 # --- Stage 1: The Builder ---
 # This stage builds the Go binary.
 # We use a specific Go version. Update "1.21" if you use a different one.
-FROM golang:1.21-alpine AS builder
+FROM golang:1.25-alpine AS builder
 
 # Set the working directory inside the container
 WORKDIR /src
